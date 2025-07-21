@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       GRADLE_MEMORY: "-Xmx4g -XX:MaxMetaspaceSize=2g"
@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Gradle Cache
-        uses: useblacksmith/cache@v5
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches/modules-2
@@ -39,12 +39,15 @@ jobs:
           [ -f ~/.gradle/caches/modules-2/modules-2.lock ] && rm -f ~/.gradle/caches/modules-2/modules-2.lock
           find ~/.gradle/caches -name "*.lock" -type f -delete || echo "No lock files found"
 
-      - name: Setup java
-        uses: useblacksmith/setup-java@v5
+      - name: Set up GraalVM JDK 21
+        uses: graalvm/setup-graalvm@v1
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          java-version: 21
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          cache: gradle
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       - name: Configure Git
         run: |
           git config --global user.email "no-reply@github.com"
@@ -78,9 +81,11 @@ jobs:
                    --build-cache \
                    --no-daemon
 
+      - name: Create MojmapPaperclipJar
+        run: ./gradlew createMojmapPaperclipJar --stacktrace --parallel --no-daemon
+
       - name: Rename Paperclip JARs
-        run: |
-          mv leaf-server/build/libs/nycticorax-paperclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar ./nycticorax-1.21.8.jar
+        run: mv nycticorax-server/build/libs/nycticorax-paperclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar ./nycticorax-1.21.8.jar
       - name: Upload Leaf as build artifact
         uses: actions/upload-artifact@v4
         with:
