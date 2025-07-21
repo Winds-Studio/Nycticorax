@@ -1,0 +1,24 @@
+--- a/leaf-api/build.gradle.kts
++++ b/leaf-api/build.gradle.kts
+@@ -119,17 +_,21 @@
+             srcDir(generatedDir)
+             // Leaf start - project setup
+             srcDir(file("../paper-api/src/main/java"))
++            srcDir(file("../leaf-api/src/main/java")) // Nycticorax - project setup
+         }
+         resources {
+             srcDir(file("../paper-api/src/main/resources"))
++            srcDir(file("../leaf-api/src/main/resources")) // Nycticorax - project setup
+         }
+     }
+     test {
+         java {
+             srcDir(file("../paper-api/src/test/java"))
++            srcDir(file("../leaf-api/src/test/java")) // Nycticorax - project setup
+         }
+         resources {
+             srcDir(file("../paper-api/src/test/resources"))
++            srcDir(file("../leaf-api/src/test/resources")) // Nycticorax - project setup
+             // Leaf end - project setup
+         }
+     }

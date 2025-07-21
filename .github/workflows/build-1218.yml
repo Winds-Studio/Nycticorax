@@ -1,0 +1,88 @@
+name: Build Nycticorax 1.21.8
+
+on:
+  push:
+    branches: [ "ver/1.21.8" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: blacksmith-8vcpu-ubuntu-2204
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      GRADLE_MEMORY: "-Xmx4g -XX:MaxMetaspaceSize=2g"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Gradle Cache
+        uses: useblacksmith/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/caches/jars-*
+            ~/.gradle/caches/transforms-*
+            ~/.gradle/wrapper
+            ~/.gradle/build-cache-*
+            ~/.gradle/configuration-cache-*
+            .gradle/patchCache
+            .gradle/patched
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'patches/**/*.patch') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Gradle Cache Cleanup
+        run: |
+          mkdir -p ~/.gradle/caches/modules-2
+          [ -f ~/.gradle/caches/modules-2/modules-2.lock ] && rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          find ~/.gradle/caches -name "*.lock" -type f -delete || echo "No lock files found"
+
+      - name: Setup java
+        uses: useblacksmith/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "no-reply@github.com"
+          git config --global user.name "Github Actions"
+          git config --global core.preloadindex true
+          git config --global core.fscache true
+          git config --global gc.auto 256
+
+      - name: Configure Gradle Properties
+        run: |
+          mkdir -p ~/.gradle
+          echo "org.gradle.caching=true" >> ~/.gradle/gradle.properties
+          echo "org.gradle.configuration-cache=true" >> ~/.gradle/gradle.properties
+          echo "org.gradle.configuration-cache.problems=warn" >> ~/.gradle/gradle.properties
+          echo "org.gradle.jvmargs=${{ env.GRADLE_MEMORY }} -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
+          echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
+          echo "org.gradle.daemon=true" >> ~/.gradle/gradle.properties
+          # This is only need if we create custom gradle.properies in home directory
+          echo "leafUsername=${{ secrets.REPO_USER }}" >> ~/.gradle/gradle.properties
+          echo "leafPassword=${{ secrets.REPO_PASSWORD }}" >> ~/.gradle/gradle.properties
+
+      - name: Apply patches
+        run: |
+          PARALLELISM=$(($(nproc) * 2))
+          ./gradlew -Dorg.gradle.jvmargs="${{ env.GRADLE_MEMORY }}" \
+                   -Dleaf.patcher.parallelism=$PARALLELISM \
+                   -Dleaf.patcher.incremental=true \
+                   applyAllPatches \
+                   --stacktrace --parallel \
+                   --max-workers=$PARALLELISM \
+                   --build-cache \
+                   --no-daemon
+
+      - name: Rename Paperclip JARs
+        run: |
+          mv leaf-server/build/libs/nycticorax-paperclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar ./nycticorax-1.21.8.jar
+      - name: Upload Leaf as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nycticorax 1.21.8
+          path: ./nycticorax-1.21.8.jar

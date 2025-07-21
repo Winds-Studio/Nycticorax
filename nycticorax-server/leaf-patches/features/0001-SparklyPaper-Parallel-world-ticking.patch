@@ -1,0 +1,442 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Altiami <yoshimo.kristin@gmail.com>
+Date: Wed, 5 Mar 2025 13:13:24 -0800
+Subject: [PATCH] SparklyPaper: Parallel world ticking
+
+Original project: https://github.com/SparklyPower/SparklyPaper
+
+Commit: 589225495e566c60feb907a3571c1ccba855b6ed
+
+diff --git a/src/main/java/org/dreeam/leaf/async/world/PWTEventScheduler.java b/src/main/java/org/dreeam/leaf/async/world/PWTEventScheduler.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c74d89090681efb7dcfea02c60367b5e6c2e84c7
+--- /dev/null
++++ b/src/main/java/org/dreeam/leaf/async/world/PWTEventScheduler.java
+@@ -0,0 +1,37 @@
++package org.dreeam.leaf.async.world;
++
++import com.google.common.util.concurrent.ThreadFactoryBuilder;
++
++import java.util.concurrent.ExecutorService;
++import java.util.concurrent.Executors;
++
++public class PWTEventScheduler {
++
++    private static volatile PWTEventScheduler instance;
++    private final ExecutorService executor;
++
++    private PWTEventScheduler() {
++        this.executor = Executors.newCachedThreadPool(
++            new ThreadFactoryBuilder()
++                .setNameFormat("Leaf PWT Event Scheduler Thread - %d")
++                .setDaemon(true)
++                .setPriority(Thread.NORM_PRIORITY - 2)
++                .build()
++        );
++    }
++
++    public static PWTEventScheduler getScheduler() {
++        if (instance == null) {
++            synchronized (PWTEventScheduler.class) {
++                if (instance == null) {
++                    instance = new PWTEventScheduler();
++                }
++            }
++        }
++        return instance;
++    }
++
++    public void scheduleTask(Runnable task) {
++        this.executor.execute(task);
++    }
++}
+diff --git a/src/main/java/org/dreeam/leaf/async/world/ReadOperationType.java b/src/main/java/org/dreeam/leaf/async/world/ReadOperationType.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..dffe7ba0b0fca8bb539a5287f77b00782f8cc45f
+--- /dev/null
++++ b/src/main/java/org/dreeam/leaf/async/world/ReadOperationType.java
+@@ -0,0 +1,11 @@
++package org.dreeam.leaf.async.world;
++
++public enum ReadOperationType {
++    BLOCK_GET_BIOME,
++    BLOCK_GET_COMPUTED_BIOME,
++    BLOCK_IS_INDIRECTLY_POWERED,
++    BLOCK_GET_BLOCK_POWER,
++    BLOCK_RAY_TRACE,
++    BLOCK_CAN_PLACE,
++    BLOCK_GET_NMS_STATE
++}
+diff --git a/src/main/java/org/dreeam/leaf/async/world/SparklyPaperServerLevelTickExecutorThreadFactory.java b/src/main/java/org/dreeam/leaf/async/world/SparklyPaperServerLevelTickExecutorThreadFactory.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0436491a838a38fca7b7d6fffbbceb4c3c601895
+--- /dev/null
++++ b/src/main/java/org/dreeam/leaf/async/world/SparklyPaperServerLevelTickExecutorThreadFactory.java
+@@ -0,0 +1,30 @@
++package org.dreeam.leaf.async.world;
++
++import ca.spottedleaf.moonrise.common.util.TickThread;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.concurrent.ThreadFactory;
++
++public class SparklyPaperServerLevelTickExecutorThreadFactory implements ThreadFactory {
++
++    private final String worldName;
++
++    public SparklyPaperServerLevelTickExecutorThreadFactory(final String worldName) {
++        this.worldName = worldName;
++    }
++
++    @Override
++    public Thread newThread(@NotNull Runnable runnable) {
++        TickThread.ServerLevelTickThread tickThread = new TickThread.ServerLevelTickThread(runnable, "Leaf World Ticking Thread - " + this.worldName);
++
++        if (tickThread.isDaemon()) {
++            tickThread.setDaemon(false);
++        }
++
++        if (tickThread.getPriority() != 5) {
++            tickThread.setPriority(5);
++        }
++
++        return tickThread;
++    }
++}
+diff --git a/src/main/java/org/dreeam/leaf/async/world/WorldReadRequest.java b/src/main/java/org/dreeam/leaf/async/world/WorldReadRequest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8fb45b7c4a9337f283b1bc3ad0ac07e9d2abc450
+--- /dev/null
++++ b/src/main/java/org/dreeam/leaf/async/world/WorldReadRequest.java
+@@ -0,0 +1,10 @@
++package org.dreeam.leaf.async.world;
++
++import java.util.concurrent.CompletableFuture;
++
++public record WorldReadRequest(
++    ReadOperationType type,
++    Object[] params, // Parameters for the read operation
++    CompletableFuture<Object> future // Future to complete with the result
++) {
++}
+diff --git a/src/main/java/org/dreeam/leaf/config/modules/async/SparklyPaperParallelWorldTicking.java b/src/main/java/org/dreeam/leaf/config/modules/async/SparklyPaperParallelWorldTicking.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1d89ae823b373f85f47aa5260fcd1976c37c2720
+--- /dev/null
++++ b/src/main/java/org/dreeam/leaf/config/modules/async/SparklyPaperParallelWorldTicking.java
+@@ -0,0 +1,65 @@
++package org.dreeam.leaf.config.modules.async;
++
++import org.dreeam.leaf.config.ConfigModules;
++import org.dreeam.leaf.config.EnumConfigCategory;
++import org.dreeam.leaf.config.LeafConfig;
++import org.dreeam.leaf.config.annotations.Experimental;
++
++public class SparklyPaperParallelWorldTicking extends ConfigModules {
++
++    public String getBasePath() {
++        return EnumConfigCategory.ASYNC.getBaseKeyName() + ".parallel-world-ticking";
++    }
++
++    @Experimental
++    public static boolean enabled = false;
++    public static int threads = 8;
++    public static boolean logContainerCreationStacktraces = false;
++    public static boolean disableHardThrow = false;
++    @Deprecated
++    public static Boolean runAsyncTasksSync;
++    // STRICT, BUFFERED, DISABLED
++    public static String asyncUnsafeReadHandling = "BUFFERED";
++
++    @Override
++    public void onLoaded() {
++        config.addCommentRegionBased(getBasePath(), """
++                **Experimental feature**
++                Enables parallel world ticking to improve performance on multi-core systems.""",
++            """
++                **实验性功能**
++                启用并行世界处理以提高多核 CPU 使用率.""");
++
++        enabled = config.getBoolean(getBasePath() + ".enabled", enabled);
++        threads = config.getInt(getBasePath() + ".threads", threads);
++        if (enabled) {
++            if (threads <= 0) threads = 8;
++        } else {
++            threads = 0;
++        }
++
++        logContainerCreationStacktraces = config.getBoolean(getBasePath() + ".log-container-creation-stacktraces", logContainerCreationStacktraces);
++        logContainerCreationStacktraces = enabled && logContainerCreationStacktraces;
++        disableHardThrow = config.getBoolean(getBasePath() + ".disable-hard-throw", disableHardThrow);
++        disableHardThrow = enabled && disableHardThrow;
++        asyncUnsafeReadHandling = config.getString(getBasePath() + ".async-unsafe-read-handling", asyncUnsafeReadHandling).toUpperCase();
++
++        if (!asyncUnsafeReadHandling.equals("STRICT") && !asyncUnsafeReadHandling.equals("BUFFERED") && !asyncUnsafeReadHandling.equals("DISABLED")) {
++            LeafConfig.LOGGER.warn("Invalid value for {}.async-unsafe-read-handling: {}, fallback to STRICT.", getBasePath(), asyncUnsafeReadHandling);
++            asyncUnsafeReadHandling = "STRICT";
++        }
++        if (!enabled) {
++            asyncUnsafeReadHandling = "DISABLED";
++        }
++
++        // Transfer old config
++        runAsyncTasksSync = config.getBoolean(getBasePath() + ".run-async-tasks-sync");
++        if (runAsyncTasksSync != null && runAsyncTasksSync) {
++            LeafConfig.LOGGER.warn("The setting '{}.run-async-tasks-sync' is deprecated, removed automatically. Use 'async-unsafe-read-handling: BUFFERED' for buffered reads instead.", getBasePath());
++        }
++
++        if (enabled) {
++            LeafConfig.LOGGER.info("Using {} threads for Parallel World Ticking", threads);
++        }
++    }
++}
+diff --git a/src/main/java/org/dreeam/leaf/subcommands/MSPTCommand.java b/src/main/java/org/dreeam/leaf/subcommands/MSPTCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e96bc6976a17ba3b21ae11a26bc2968148df58c3
+--- /dev/null
++++ b/src/main/java/org/dreeam/leaf/subcommands/MSPTCommand.java
+@@ -0,0 +1,244 @@
++package org.dreeam.leaf.subcommands;
++
++import net.kyori.adventure.text.Component;
++import net.minecraft.server.MinecraftServer;
++import org.checkerframework.checker.nullness.qual.NonNull;
++import org.checkerframework.framework.qual.DefaultQualifier;
++import org.dreeam.leaf.command.LeafCommand;
++import org.dreeam.leaf.command.PermissionedLeafSubcommand;
++import org.dreeam.leaf.config.modules.async.SparklyPaperParallelWorldTicking;
++import org.bukkit.command.CommandSender;
++import org.bukkit.permissions.PermissionDefault;
++
++import java.text.DecimalFormat;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Collections;
++import java.util.List;
++
++import static net.kyori.adventure.text.Component.text;
++import static net.kyori.adventure.text.format.NamedTextColor.*;
++
++@DefaultQualifier(NonNull.class)
++public final class MSPTCommand extends PermissionedLeafSubcommand {
++
++    public static final String LITERAL_ARGUMENT = "mspt";
++    public static final String PERM = LeafCommand.BASE_PERM + "." + LITERAL_ARGUMENT;
++    private static final DecimalFormat DF = new DecimalFormat("########0.0");
++    private static final Component SLASH = text("/");
++
++    public MSPTCommand() {
++        super(PERM, PermissionDefault.TRUE);
++    }
++
++    @Override
++    public boolean execute(final CommandSender sender, final String subCommand, final String[] args) {
++        // Check if parallel world ticking is enabled
++        if (!SparklyPaperParallelWorldTicking.enabled) {
++            sender.sendMessage(Component.text()
++                .content("Per-world MSPT tracking is only available when parallel world ticking is enabled.")
++                .color(RED)
++                .build());
++            sender.sendMessage(Component.text()
++                .content("Please enable it in your Leaf configuration to use this command.")
++                .color(GRAY)
++                .build());
++            return true;
++        }
++
++        // Check if compact mode is requested
++        boolean compactMode = args.length > 0 && args[0].equalsIgnoreCase("compact");
++
++        MinecraftServer server = MinecraftServer.getServer();
++
++        if (compactMode) {
++            displayCompactStats(sender, server);
++        } else {
++            // Display header
++            sender.sendMessage(Component.text()
++                .content("━━━━━━━━━━━━━ ")
++                .color(GOLD)
++                .append(Component.text("MSPT Statistics").color(YELLOW))
++                .append(Component.text(" ━━━━━━━━━━━━━").color(GOLD))
++                .build());
++
++            // Overall server MSPT
++            displayServerMSPT(sender, server);
++
++            // Add separator
++            sender.sendMessage(Component.text(""));
++
++            // World-specific MSPT
++            displayWorldMSPT(sender, server);
++        }
++
++        return true;
++    }
++
++    private void displayCompactStats(CommandSender sender, MinecraftServer server) {
++        // Get server stats (only 5s data with avg/min/max)
++        List<Component> serverTimes = eval(server.tickTimes5s.getTimes());
++
++        // Display server stats in compact form
++        sender.sendMessage(Component.text()
++            .content("Server: ")
++            .color(GOLD)
++            .append(serverTimes.get(0)).append(SLASH).append(serverTimes.get(1)).append(SLASH).append(serverTimes.get(2))
++            .build());
++
++        // Display world stats in compact form
++        for (net.minecraft.server.level.ServerLevel serverLevel : server.getAllLevels()) {
++            List<Component> worldTimes = eval(serverLevel.tickTimes5s.getTimes());
++
++            sender.sendMessage(Component.text()
++                .content(serverLevel.getWorld().getName() + ": ")
++                .color(GOLD)
++                .append(worldTimes.get(0)).append(SLASH).append(worldTimes.get(1)).append(SLASH).append(worldTimes.get(2))
++                .build());
++        }
++    }
++
++    private void displayServerMSPT(CommandSender sender, MinecraftServer server) {
++        List<Component> times = new ArrayList<>();
++        times.addAll(eval(server.tickTimes5s.getTimes()));
++        times.addAll(eval(server.tickTimes10s.getTimes()));
++        times.addAll(eval(server.tickTimes60s.getTimes()));
++
++        sender.sendMessage(Component.text()
++            .content("Server tick times ")
++            .color(GOLD)
++            .append(Component.text()
++                .content("(avg/min/max)")
++                .color(YELLOW)
++            )
++            .build());
++
++        sender.sendMessage(Component.text()
++            .content("  5s: ")
++            .color(GOLD)
++            .append(times.get(0)).append(SLASH).append(times.get(1)).append(SLASH).append(times.get(2))
++            .build());
++
++        sender.sendMessage(Component.text()
++            .content(" 10s: ")
++            .color(GOLD)
++            .append(times.get(3)).append(SLASH).append(times.get(4)).append(SLASH).append(times.get(5))
++            .build());
++
++        sender.sendMessage(Component.text()
++            .content(" 60s: ")
++            .color(GOLD)
++            .append(times.get(6)).append(SLASH).append(times.get(7)).append(SLASH).append(times.get(8))
++            .build());
++    }
++
++    private void displayWorldMSPT(CommandSender sender, MinecraftServer server) {
++        sender.sendMessage(Component.text()
++            .content("World-specific tick times ")
++            .color(GOLD)
++            .append(Component.text()
++                .content("(avg/min/max)")
++                .color(YELLOW)
++            )
++            .build());
++
++        for (net.minecraft.server.level.ServerLevel serverLevel : server.getAllLevels()) {
++            List<Component> worldTimes = new ArrayList<>();
++            worldTimes.addAll(eval(serverLevel.tickTimes5s.getTimes()));
++            worldTimes.addAll(eval(serverLevel.tickTimes10s.getTimes()));
++            worldTimes.addAll(eval(serverLevel.tickTimes60s.getTimes()));
++
++            // World name header
++            sender.sendMessage(Component.text()
++                .content("➤ ")
++                .color(YELLOW)
++                .append(Component.text(serverLevel.getWorld().getName()).color(GOLD))
++                .build());
++
++            // Display time periods
++            sender.sendMessage(Component.text()
++                .content("  5s: ")
++                .color(GRAY)
++                .append(worldTimes.get(0)).append(SLASH).append(worldTimes.get(1)).append(SLASH).append(worldTimes.get(2))
++                .build());
++
++            sender.sendMessage(Component.text()
++                .content(" 10s: ")
++                .color(GRAY)
++                .append(worldTimes.get(3)).append(SLASH).append(worldTimes.get(4)).append(SLASH).append(worldTimes.get(5))
++                .build());
++
++            sender.sendMessage(Component.text()
++                .content(" 60s: ")
++                .color(GRAY)
++                .append(worldTimes.get(6)).append(SLASH).append(worldTimes.get(7)).append(SLASH).append(worldTimes.get(8))
++                .build());
++
++            boolean hasMoreWorlds = false;
++            Iterable<net.minecraft.server.level.ServerLevel> levels = server.getAllLevels();
++            for (net.minecraft.server.level.ServerLevel level : levels) {
++                if (level != serverLevel) {
++                    hasMoreWorlds = true;
++                    break;
++                }
++            }
++
++            if (hasMoreWorlds) {
++                sender.sendMessage(Component.text(""));
++            }
++        }
++    }
++
++    private static List<Component> eval(long[] times) {
++        long min = Integer.MAX_VALUE;
++        long max = 0L;
++        long total = 0L;
++        int count = 0;
++
++        for (long value : times) {
++            if (value > 0L) {
++                count++;
++                if (value < min) min = value;
++                if (value > max) max = value;
++                total += value;
++            }
++        }
++
++        if (count == 0) {
++            // No data available yet
++            return Arrays.asList(
++                text("N/A", GRAY),
++                text("N/A", GRAY),
++                text("N/A", GRAY)
++            );
++        }
++
++        double avgD = ((double) total / (double) count) * 1.0E-6D;
++        double minD = ((double) min) * 1.0E-6D;
++        double maxD = ((double) max) * 1.0E-6D;
++
++        return Arrays.asList(getColoredValue(avgD), getColoredValue(minD), getColoredValue(maxD));
++    }
++
++    private static Component getColoredValue(double value) {
++        return text(DF.format(value) + "ms",
++            value >= 50 ? RED :
++                value >= 40 ? YELLOW :
++                    value >= 30 ? GOLD :
++                        value >= 20 ? GREEN :
++                            AQUA);
++    }
++
++    @Override
++    public List<String> tabComplete(final CommandSender sender, final String subCommand, final String[] args) {
++        if (!SparklyPaperParallelWorldTicking.enabled) {
++            return Collections.emptyList();
++        }
++
++        if (args.length == 1) {
++            return Collections.singletonList("compact");
++        }
++
++        return Collections.emptyList();
++    }
++}
