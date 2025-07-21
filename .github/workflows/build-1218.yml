@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: blacksmith-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       GRADLE_MEMORY: "-Xmx4g -XX:MaxMetaspaceSize=2g"
