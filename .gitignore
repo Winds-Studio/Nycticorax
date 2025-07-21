@@ -18,12 +18,16 @@
 .gradle
 build
 
-# Leaf
+# Nycticorax
 build-data/dev-imports.txt
-leaf-archived-patches/todo
 run
 
 leaf-api/
 leaf-server/
-paper-api
-paper-server
+paper-api/
+paper-server/
+
+nycticorax-api/build.gradle.kts
+nycticorax-server/build.gradle.kts
+
+nycticorax-server/src/minecraft
