@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pascalpex <pascalpex@gmail.com>
+Date: Tue, 22 Jul 2025 08:58:30 +0200
+Subject: [PATCH] Rebrand
+
+
+diff --git a/src/main/java/io/papermc/paper/ServerBuildInfo.java b/src/main/java/io/papermc/paper/ServerBuildInfo.java
+index c198304386e83edc2ec582fdf66d97d624004771..8a7936606873a09c222746b5b90ec1e2049a6f9a 100644
+--- a/src/main/java/io/papermc/paper/ServerBuildInfo.java
++++ b/src/main/java/io/papermc/paper/ServerBuildInfo.java
+@@ -41,6 +41,13 @@ public interface ServerBuildInfo {
+     Key BRAND_LEAF_ID = Key.key("winds-studio", "leaf");
+     // Leaf end - Rebrand
+ 
++    // Nycticorax start - Rebrand
++    /**
++     * The brand id for Nycticorax.
++     */
++    Key BRAND_NYCTICORAX_ID = Key.key("winds-studio", "nycticorax");
++    // Nycticorax end - Rebrand
++
+     /**
+      * Gets the {@code ServerBuildInfo}.
+      *
