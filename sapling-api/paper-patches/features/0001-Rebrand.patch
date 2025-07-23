@@ -12,12 +12,12 @@ index c198304386e83edc2ec582fdf66d97d624004771..8a7936606873a09c222746b5b90ec1e2
      Key BRAND_LEAF_ID = Key.key("winds-studio", "leaf");
      // Leaf end - Rebrand
  
-+    // Nycticorax start - Rebrand
++    // Sapling start - Rebrand
 +    /**
-+     * The brand id for Nycticorax.
++     * The brand id for Sapling.
 +     */
-+    Key BRAND_NYCTICORAX_ID = Key.key("winds-studio", "nycticorax");
-+    // Nycticorax end - Rebrand
++    Key BRAND_NYCTICORAX_ID = Key.key("winds-studio", "sapling");
++    // Sapling end - Rebrand
 +
      /**
       * Gets the {@code ServerBuildInfo}.

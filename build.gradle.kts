@@ -68,23 +68,23 @@ paperweight {
 
         patchFile {
             path = "leaf-server/build.gradle.kts"
-            outputFile = file("nycticorax-server/build.gradle.kts")
-            patchFile = file("nycticorax-server/build.gradle.kts.patch")
+            outputFile = file("sapling-server/build.gradle.kts")
+            patchFile = file("sapling-server/build.gradle.kts.patch")
         }
         patchFile {
             path = "leaf-api/build.gradle.kts"
-            outputFile = file("nycticorax-api/build.gradle.kts")
-            patchFile = file("nycticorax-api/build.gradle.kts.patch")
+            outputFile = file("sapling-api/build.gradle.kts")
+            patchFile = file("sapling-api/build.gradle.kts.patch")
         }
         patchRepo("paperApi") {
             upstreamPath = "paper-api"
-            patchesDir = file("nycticorax-api/paper-patches")
+            patchesDir = file("sapling-api/paper-patches")
             outputDir = file("paper-api")
         }
         patchDir("leafApi") {
             upstreamPath = "leaf-api"
             excludes = listOf("build.gradle.kts", "build.gradle.kts.patch", "paper-patches")
-            patchesDir = file("nycticorax-api/leaf-patches")
+            patchesDir = file("sapling-api/leaf-patches")
             outputDir = file("leaf-api")
         }
     }

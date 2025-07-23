@@ -33,9 +33,9 @@ if (!file(".git").exists()) {
     error(errorText)
 }
 
-rootProject.name = "nycticorax"
+rootProject.name = "sapling"
 
-for (name in listOf("nycticorax-api", "nycticorax-server")) {
+for (name in listOf("sapling-api", "sapling-server")) {
     val projName = name.lowercase(Locale.ENGLISH)
     include(projName)
 }

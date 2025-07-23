@@ -1,14 +1,11 @@
-## Nycticorax
+## Sapling
 
-![I'm penguin](public/image/impenguin.png)
+[![Github Actions Build](https://img.shields.io/github/actions/workflow/status/Winds-Studio/Sapling/build-1218.yml?&style=for-the-badge&colorA=19201a&colorB=298046)](https://github.com/Winds-Studio/Sapling/actions)
 
-[![Github Actions Build](https://img.shields.io/github/actions/workflow/status/Winds-Studio/Nycticorax/build-1218.yml?&style=for-the-badge&colorA=19201a&colorB=298046)](https://github.com/Winds-Studio/Leaf/actions)⠀
-
-**Nycticorax** is an experimental fork of [Leaf](https://leafmc.one/).
-
+**Sapling** is an experimental fork of [Leaf](https://leafmc.one/).
 
 > [!WARNING]
-> Nycticorax is an experimental fork, DO NOT use in production, use as your own risk.
+> Sapling is an experimental fork, DO NOT use in production, use as your own risk.
 
 **English** | [中文](public/readme/README_CN.md)
 

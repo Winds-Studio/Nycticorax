@@ -1,13 +1,12 @@
-## Nycticorax
+## Sapling
 
-![我是企鹅](../image/impenguin.png)
+[![Github Actions 构建](https://img.shields.io/github/actions/workflow/status/Winds-Studio/Sapling/build-1218.yml?label=%e6%9e%84%e5%bb%ba&style=for-the-badge&colorA=19201a&colorB=298046)](https://github.com/Winds-Studio/Sapling/actions)
 
-[![Github Actions 构建](https://img.shields.io/github/actions/workflow/status/Winds-Studio/Nycticorax/build-1218.yml?label=%e6%9e%84%e5%bb%ba&style=for-the-badge&colorA=19201a&colorB=298046)](https://github.com/Winds-Studio/Leaf/actions)⠀
 
-**Nycticorax** 是  [Leaf](https://leafmc.one/) 的实验性分支。
+**Sapling** 是  [Leaf](https://leafmc.one/) 的实验性分支。
 
 > [!WARNING]
-> Nycticorax 是实验性分支, 不要在生产环境中使用, 风险自负。
+> Sapling 是实验性分支, 不要在生产环境中使用, 风险自负。
 
 [English](../../README.md) | **中文**
 

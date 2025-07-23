@@ -13,7 +13,7 @@ index 18e63dca2a315ad01fa5b80ec126f4eac71f45fd..d1aa941a91836fa1da52f5d4b2b6c715
      private StackTraceElement[] uncategorizedStackTrace = new StackTraceElement[0];
      private final SystemReport systemReport = new SystemReport();
 -    private List<String> extraInfo = List.of("", "DO NOT REPORT THIS TO PAPER! REPORT TO LEAF INSTEAD!", ""); // Leaf - Rebrand
-+    private List<String> extraInfo = List.of("", "DO NOT REPORT THIS TO PAPER! REPORT TO NYCTICORYX INSTEAD!", ""); // Leaf - Rebrand // Nycticorax - Rebrand
++    private List<String> extraInfo = List.of("", "DO NOT REPORT THIS TO PAPER! REPORT TO NYCTICORYX INSTEAD!", ""); // Leaf - Rebrand // Sapling - Rebrand
  
      public CrashReport(String title, Throwable exception) {
          io.papermc.paper.util.StacktraceDeobfuscator.INSTANCE.deobfuscateThrowable(exception); // Paper
@@ -26,7 +26,7 @@ index 5a663f66820d95449ccf9117e72159a10bcd04d6..abd0dbc1e409162f381d9866047b4ba8
      public DamageSource eventEntityDamager(final Entity entity) {
          if (this.directEntity != null) {
 -            throw new IllegalStateException("Cannot set an event damager when a direct entity is already set (if you think this is a Leaf bug, please report it at https://github.com/Winds-Studio/Leaf/issues)"); // Leaf - Rebrand
-+            throw new IllegalStateException("Cannot set an event damager when a direct entity is already set (if you think this is a Nycticorax bug, please report it at https://github.com/Winds-Studio/Nycticorax/issues)"); // Leaf - Rebrand // Nycticorax - Rebrand
++            throw new IllegalStateException("Cannot set an event damager when a direct entity is already set (if you think this is a Sapling bug, please report it at https://github.com/Winds-Studio/Sapling/issues)"); // Leaf - Rebrand // Sapling - Rebrand
          }
          final DamageSource damageSource = this.copy();
          damageSource.eventEntityDamager = entity;
@@ -39,7 +39,7 @@ index 3634d68c77ee99567b51a9a848d7cbbb218a0ba7..cb5607073234dc8a66167125f051f850
      // Paper start
      private static void printOversizedLog(String msg, Path file, int x, int z) {
 -        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PAPER OR LEAF - You may ask for help on Discord, but do not file an issue. These error messages can not be removed. - If you think this is a Leaf bug, please report it at https://github.com/Winds-Studio/Leaf/issues)"); // Leaf - Rebrand
-+        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PAPER OR LEAF - You may ask for help on Discord, but do not file an issue. These error messages can not be removed. - If you think this is a Nycticorax bug, please report it at https://github.com/Winds-Studio/Nycticorax/issues)"); // Leaf - Rebrand // Nycticorax - Rebrand
++        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PAPER OR LEAF - You may ask for help on Discord, but do not file an issue. These error messages can not be removed. - If you think this is a Sapling bug, please report it at https://github.com/Winds-Studio/Sapling/issues)"); // Leaf - Rebrand // Sapling - Rebrand
      }
  
      private static CompoundTag readOversizedChunk(RegionFile regionfile, ChunkPos chunkCoordinate) throws IOException {

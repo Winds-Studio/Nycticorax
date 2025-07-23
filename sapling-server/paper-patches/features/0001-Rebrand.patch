@@ -13,7 +13,7 @@ index f59879ae7d3c73cd4c4233d30667988bf22f12f1..e46b988907795443a6161ff6576e4b05
      protected LineReader buildReader(LineReaderBuilder builder) {
          builder
 -                .appName("Leaf") // Gale - branding changes // Leaf - Rebrand
-+                .appName("Nycticorax") // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++                .appName("Sapling") // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
                  .variable(LineReader.HISTORY_FILE, java.nio.file.Paths.get(".console_history"))
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
@@ -25,7 +25,7 @@ index afaff6dcfe2044c465693dd0971d07644470ba8a..de17cdc5cb395f5fe28fb5402ba1cdaf
      private static final String BRAND_PURPUR_NAME = "Purpur";
      private static final String BRAND_LEAF_NAME = "Leaf";
      // Leaf end - Rebrand & Fix Pufferfish and Purpur patches
-+    private static final String BRAND_NYCTICORAX_NAME = "Nycticorax"; // Nycticorax - Rebrand
++    private static final String BRAND_NYCTICORAX_NAME = "Sapling"; // Sapling - Rebrand
  
      private static final String BUILD_DEV = "DEV";
  
@@ -34,10 +34,10 @@ index afaff6dcfe2044c465693dd0971d07644470ba8a..de17cdc5cb395f5fe28fb5402ba1cdaf
              getManifestAttribute(manifest, ATTRIBUTE_BRAND_ID)
                  .map(Key::key)
 -                .orElse(BRAND_LEAF_ID), // Gale - branding changes // Leaf - Rebrand
-+                .orElse(BRAND_NYCTICORAX_ID), // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++                .orElse(BRAND_NYCTICORAX_ID), // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
              getManifestAttribute(manifest, ATTRIBUTE_BRAND_NAME)
 -                .orElse(BRAND_LEAF_NAME), // Gale - branding changes // Leaf - Rebrand
-+                .orElse(BRAND_NYCTICORAX_NAME), // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++                .orElse(BRAND_NYCTICORAX_NAME), // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
              SharedConstants.getCurrentVersion().id(),
              SharedConstants.getCurrentVersion().name(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
@@ -47,7 +47,7 @@ index afaff6dcfe2044c465693dd0971d07644470ba8a..de17cdc5cb395f5fe28fb5402ba1cdaf
              || brandId.equals(BRAND_PUFFERFISH_ID)
 -            || brandId.equals(BRAND_PURPUR_ID);
 +            || brandId.equals(BRAND_PURPUR_ID)
-+            || brandId.equals(BRAND_LEAF_ID); // Nycticorax - Rebrand
++            || brandId.equals(BRAND_LEAF_ID); // Sapling - Rebrand
              // Leaf end - Rebrand & Fix Pufferfish and Purpur patches
      }
  
@@ -60,7 +60,7 @@ index 3a64b6845b1175bee2c0e4bc919eb5395657a28a..3f3b03766266c5bfa0de0e9219a0fce4
      private static final Component FETCHING = Component.text("Checking version, please wait...", NamedTextColor.WHITE, TextDecoration.ITALIC);
  
 -    public static final VersionFetcher versionFetcher = new org.dreeam.leaf.version.LeafVersionFetcher(); // Leaf - Rebrand
-+    public static final VersionFetcher versionFetcher = new org.dreeam.nycticorax.version.NycticoraxVersionFetcher(); // Leaf - Rebrand // Nycticorax - Rebrand
++    public static final VersionFetcher versionFetcher = new org.dreeam.sapling.version.SaplingVersionFetcher(); // Leaf - Rebrand // Sapling - Rebrand
      private CompletableFuture<ComputedVersion> computedVersion = CompletableFuture.completedFuture(new ComputedVersion(Component.empty(), -1)); // Precompute-- someday move that stuff out of bukkit
  
      public static LiteralCommandNode<CommandSourceStack> create() {
@@ -73,7 +73,7 @@ index f6f787db016f4d1ac14648ebf2b8e162a3e85962..de3cfb89f0a6e0f12559d94aaba6d133
              } else {
                  // this.debugTail = this.debugTail.setNext(new CraftAsyncDebugger(this.currentTick + CraftScheduler.RECENT_TICKS, task.getOwner(), task.getTaskClass())); // Paper
 -                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Leaf"); // Paper // Gale - branding changes // Leaf - Rebrand
-+                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Nycticorax"); // Paper // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Sapling"); // Paper // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
                  // We don't need to parse pending
                  // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
              }
@@ -86,7 +86,7 @@ index c3d45e60e262b8e34d76f0425f6bef79f034e8ab..79fe203e2ca9b3e4f515eb65d9b240a6
          String result = "Unknown-Version";
  
 -        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/cn.dreeam.leaf/leaf-api/pom.properties"); // Gale - branding changes // Leaf - Rebrand
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/cn.dreeam.leaf/nycticorax-api/pom.properties"); // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/cn.dreeam.leaf/sapling-api/pom.properties"); // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
          Properties properties = new Properties();
  
          if (stream != null) {
@@ -99,17 +99,17 @@ index 79eae898539f71a73525ed29d8a752f65f5f67fa..89d578f29e94d4fe2a224d4badc81d3d
                      but we do want people to report thread issues to Gale.
                      */
 -                    logger.log(Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug. This could be a Leaf bug."); // Paper // Leaf - Rebrand
-+                    logger.log(Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug. This could be a Leaf or Nycticorax bug."); // Paper // Leaf - Rebrand // Nycticorax - Rebrand
++                    logger.log(Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug. This could be a Leaf or Sapling bug."); // Paper // Leaf - Rebrand // Sapling - Rebrand
                      // Gale end - branding changes
                      logger.log(Level.SEVERE, "If you see a plugin in the Server thread dump below, then please report it to that author");
                      logger.log(Level.SEVERE, "\t *Especially* if it looks like HTTP or MySQL operations are occurring");
                      logger.log(Level.SEVERE, "If you see a world save or edit, then it means you did far more than your server can handle at once");
                      logger.log(Level.SEVERE, "\t If this is the case, consider increasing timeout-time in spigot.yml but note that this will replace the crash with LARGE lag spikes");
 -                    logger.log(Level.SEVERE, "If you are unsure or think this is a Leaf bug, please report this to https://github.com/Winds-Studio/Leaf/issues - and if you think this is a Paper bug, please report this to https://github.com/PaperMC/Paper/issues"); // Gale - branding changes // Leaf - Rebrand
-+                    logger.log(Level.SEVERE, "If you are unsure or think this is a Nycticorax bug, please report this to https://github.com/Winds-Studio/Nycticorax/issues - and if you think this is a Paper bug, please report this to https://github.com/PaperMC/Paper/issues"); // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++                    logger.log(Level.SEVERE, "If you are unsure or think this is a Sapling bug, please report this to https://github.com/Winds-Studio/Sapling/issues - and if you think this is a Paper bug, please report this to https://github.com/PaperMC/Paper/issues"); // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
                      logger.log(Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports");
 -                    logger.log(Level.SEVERE, "Leaf version: " + Bukkit.getServer().getVersion()); // Gale - branding changes // Leaf - Rebrand
-+                    logger.log(Level.SEVERE, "Nycticorax version: " + Bukkit.getServer().getVersion()); // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++                    logger.log(Level.SEVERE, "Sapling version: " + Bukkit.getServer().getVersion()); // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
  
                      if (net.minecraft.world.level.Level.lastPhysicsProblem != null) {
                          logger.log(Level.SEVERE, "------------------------------");
@@ -118,14 +118,14 @@ index 79eae898539f71a73525ed29d8a752f65f5f67fa..89d578f29e94d4fe2a224d4badc81d3d
                      but we do want people to report thread issues to Gale.
                      */
 -                    logger.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Leaf bug, please report it at https://github.com/Winds-Studio/Leaf/issues - THIS IS NOT A PAPER BUG OR CRASH - " + Bukkit.getServer().getVersion() + " ---"); // Leaf - Rebrand
-+                    logger.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Nycticorax bug, please report it at https://github.com/Winds-Studio/Nycticorax/issues - THIS IS NOT A PAPER BUG OR CRASH - " + Bukkit.getServer().getVersion() + " ---"); // Leaf - Rebrand // Nycticorax - Rebrand
++                    logger.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Sapling bug, please report it at https://github.com/Winds-Studio/Sapling/issues - THIS IS NOT A PAPER BUG OR CRASH - " + Bukkit.getServer().getVersion() + " ---"); // Leaf - Rebrand // Sapling - Rebrand
                      // Gale end - branding changes
                      logger.log(Level.SEVERE, "The server has not responded for " + (currentTime - lastTick) / 1000 + " seconds! Creating thread dump");
                  }
                  // Paper end - Different message for short timeout
                  logger.log(Level.SEVERE, "------------------------------");
 -                logger.log(Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Leaf!):"); // Paper // Gale - branding changes // Leaf - Rebrand
-+                logger.log(Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Nycticorax!):"); // Paper // Gale - branding changes // Leaf - Rebrand // Nycticorax - Rebrand
++                logger.log(Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Sapling!):"); // Paper // Gale - branding changes // Leaf - Rebrand // Sapling - Rebrand
                  FeatureHooks.dumpAllChunkLoadInfo(MinecraftServer.getServer(), isLongTimeout); // Paper - log detailed tick information
                  WatchdogThread.dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(MinecraftServer.getServer().serverThread.threadId(), Integer.MAX_VALUE), logger);
                  logger.log(Level.SEVERE, "------------------------------");
@@ -134,7 +134,7 @@ index 79eae898539f71a73525ed29d8a752f65f5f67fa..89d578f29e94d4fe2a224d4badc81d3d
                      but we do want people to report thread issues to Gale.
                      */
 -                    logger.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Leaf bug, please report it at https://github.com/Winds-Studio/Leaf/issues - THIS IS NOT A PAPER BUG OR CRASH ---"); // Leaf - Rebrand
-+                    logger.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Nycticorax bug, please report it at https://github.com/Winds-Studio/Nycticorax/issues - THIS IS NOT A PAPER BUG OR CRASH ---"); // Leaf - Rebrand // Nycticorax - Rebrand
++                    logger.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Sapling bug, please report it at https://github.com/Winds-Studio/Sapling/issues - THIS IS NOT A PAPER BUG OR CRASH ---"); // Leaf - Rebrand // Sapling - Rebrand
                      // Gale end - branding changes
                  }
  

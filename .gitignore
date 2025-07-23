@@ -27,7 +27,7 @@ leaf-server/
 paper-api/
 paper-server/
 
-nycticorax-api/build.gradle.kts
-nycticorax-server/build.gradle.kts
+sapling-api/build.gradle.kts
+sapling-server/build.gradle.kts
 
-nycticorax-server/src/minecraft
+sapling-server/src/minecraft

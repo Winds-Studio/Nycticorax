@@ -1,4 +1,4 @@
-name: Build Nycticorax 1.21.8
+name: Build Sapling 1.21.8
 
 on:
   push:
@@ -85,9 +85,9 @@ jobs:
         run: ./gradlew createMojmapPaperclipJar --stacktrace --parallel --no-daemon
 
       - name: Rename Paperclip JARs
-        run: mv nycticorax-server/build/libs/nycticorax-paperclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar ./nycticorax-1.21.8.jar
+        run: mv sapling-server/build/libs/sapling-paperclip-1.21.8-R0.1-SNAPSHOT-mojmap.jar ./sapling-1.21.8.jar
       - name: Upload Leaf as build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Nycticorax 1.21.8
-          path: ./nycticorax-1.21.8.jar
+          name: Sapling 1.21.8
+          path: ./sapling-1.21.8.jar
