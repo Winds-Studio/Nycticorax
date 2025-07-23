@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dreeam <61569423+Dreeam-qwq@users.noreply.github.com>
+Date: Mon, 21 Jul 2025 10:22:33 +0800
+Subject: [PATCH] Async target finding patch
+
+
+diff --git a/src/main/java/org/dreeam/leaf/config/modules/async/AsyncTargetFinding.java b/src/main/java/org/dreeam/leaf/config/modules/async/AsyncTargetFinding.java
+index 492d2dd93f063e36f5957026b18c33d425e293a3..101b9eaf638fa38499e85f894aed61b1be1c7124 100644
+--- a/src/main/java/org/dreeam/leaf/config/modules/async/AsyncTargetFinding.java
++++ b/src/main/java/org/dreeam/leaf/config/modules/async/AsyncTargetFinding.java
+@@ -34,13 +34,10 @@ public class AsyncTargetFinding extends ConfigModules {
+ 
+         enabled = config.getBoolean(getBasePath() + ".enabled", enabled);
+         // Disable if parallel world ticking is enabled, as they are incompatible.
+-        // TODO: waiting PWT
+-        /*
+         if (enabled && SparklyPaperParallelWorldTicking.enabled) {
+             LeafConfig.LOGGER.warn("Async target finding is incompatible with Parallel World Ticking. Disabling Async target finding automatically.");
+             enabled = false;
+         }
+-         */
+         alertOther = config.getBoolean(getBasePath() + ".async-alert-other", true);
+         searchBlock = config.getBoolean(getBasePath() + ".async-search-block", true);
+         searchEntity = config.getBoolean(getBasePath() + ".async-search-entity", true);

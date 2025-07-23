@@ -1,4 +1,4 @@
-name: Automatically update Paper commit hash
+name: Automatically update Leaf commit hash
 
 on:
   workflow_dispatch:
@@ -9,73 +9,72 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Sapling repository
+        uses: actions/checkout@v4
+        with:
+          path: 'Sapling'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout Leaf repository
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           path: 'Leaf'
+          repository: "Winds-Studio/Leaf"
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout Paper repository
-        uses: actions/checkout@main
-        with:
-          path: 'Paper'
-          repository: "PaperMC/Paper"
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get Paper latest commit Hash
-        id: paperCommit
-        run: |
-          cd Paper
-          echo "paperCommit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Get Leaf Current Paper commit Hash
-        id: currPaperCommit
+      - name: Get Leaf latest commit Hash
+        id: leafCommit
         run: |
           cd Leaf
-          currPaperCommit=$(grep "^paperCommit\s*=" gradle.properties | sed 's/^paperCommit\s*=\s*//')
-          echo "currPaperCommit=$currPaperCommit" >> $GITHUB_OUTPUT
+          echo "leafCommit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Update paperCommit in Leaf
+      - name: Get Sapling Current Leaf commit Hash
+        id: currLeafCommit
         run: |
-          cd Leaf
-          sed -i "s/\(paperCommit\s*=\s*\).*/\1$PAPER_COMMIT/" gradle.properties
+          cd Sapling
+          currLeafCommit=$(grep "^leafCommit\s*=" gradle.properties | sed 's/^leafCommit\s*=\s*//')
+          echo "currLeafCommit=$currLeafCommit" >> $GITHUB_OUTPUT
+
+      - name: Update leafCommit in Sapling
+        run: |
+          cd Sapling
+          sed -i "s/\(leafCommit\s*=\s*\).*/\1$LEAF_COMMIT/" gradle.properties
         env:
-          PAPER_COMMIT: ${{ steps.paperCommit.outputs.paperCommit }}
+          LEAF_COMMIT: ${{ steps.leafCommit.outputs.leafCommit }}
 
       - name: Grant execute permission for gradlew
         run: |
-          cd Leaf
+          cd Sapling
           git config --global user.name "Dreeam-qwq"
           git config --global user.email 61569423+Dreeam-qwq@users.noreply.github.com
           chmod +x gradlew
 
-      - uses: actions/setup-java@main
+      - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '21'
 
       - name: Running tests before push
         run: |
-          cd Leaf
+          cd Sapling
           if ! git diff --quiet; then
             echo "Running tests...."
             ./gradlew applyAllPatches
-            ./gradlew build -x test
-            ./gradlew rebuildPaperPatches
+            ./gradlew build -x test -x javadoc
+            ./gradlew rebuildLeafPatches
             ./gradlew rebuildAllServerPatches
           fi
 
       - name: Check for changes and write to repository
         run: |
-          cd Leaf
+          cd Sapling
           if ! git diff --quiet; then
             echo "Writing to repo....."
             git add .
-            chmod +x ./scripts/upstreamCommit.sh
-            ./scripts/upstreamCommit.sh --paper $CURR_PAPER_COMMIT
+            git commit -m "Updated Upstream (Leaf)"
             git push
           else
             echo "No changes to commit."
           fi
         env:
-          CURR_PAPER_COMMIT: ${{ steps.currPaperCommit.outputs.currPaperCommit }}
+          CURR_LEAF_COMMIT: ${{ steps.currLeafCommit.outputs.currLeafCommit }}
