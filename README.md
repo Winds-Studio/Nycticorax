@@ -14,4 +14,4 @@
 - QQ Group: `619278377`
 
 ## ⚖️ License
-See Leaf's [License](https://github.com/Winds-Studio/Leaf?tab=readme-ov-file#%EF%B8%8F-license)
+Sapling is a subproject of Leaf that uses same [License](https://github.com/Winds-Studio/Leaf?tab=readme-ov-file#%EF%B8%8F-license).
