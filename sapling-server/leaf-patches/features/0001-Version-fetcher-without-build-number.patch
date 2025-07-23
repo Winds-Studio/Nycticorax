@@ -5,7 +5,7 @@ Subject: [PATCH] Version fetcher without build number
 
 
 diff --git a/src/main/java/org/galemc/gale/version/AbstractPaperVersionFetcher.java b/src/main/java/org/galemc/gale/version/AbstractPaperVersionFetcher.java
-index 4c69c10f6b4dacb33ed3eb55437ec88422792f71..07dc01376499fed82bdb7e8982afb5b500f66fce 100644
+index 4c69c10f6b4dacb33ed3eb55437ec88422792f71..a1a0614aabcd663647ff97d02cef158278ac0cd8 100644
 --- a/src/main/java/org/galemc/gale/version/AbstractPaperVersionFetcher.java
 +++ b/src/main/java/org/galemc/gale/version/AbstractPaperVersionFetcher.java
 @@ -66,7 +66,7 @@ public abstract class AbstractPaperVersionFetcher implements VersionFetcher {
@@ -13,7 +13,7 @@ index 4c69c10f6b4dacb33ed3eb55437ec88422792f71..07dc01376499fed82bdb7e8982afb5b5
          final Component updateMessage;
          final ServerBuildInfo build = ServerBuildInfo.buildInfo();
 -        if (build.buildNumber().isEmpty() || build.gitCommit().isEmpty()) { // Gale - branding changes - version fetcher
-+        if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) { // Gale - branding changes - version fetcher // Nycticorax - do not require build number
++        if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) { // Gale - branding changes - version fetcher // Sapling - do not require build number
              updateMessage = text("You are running a development version without access to version information", color(0xFF5300));
          } else {
              updateMessage = getUpdateStatusMessage(this.gitHubOrganizationName + "/" + this.gitHubRepoName, build); // Gale - branding changes - version fetcher

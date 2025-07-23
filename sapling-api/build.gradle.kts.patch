@@ -4,21 +4,21 @@
              srcDir(generatedDir)
              // Leaf start - project setup
              srcDir(file("../paper-api/src/main/java"))
-+            srcDir(file("../leaf-api/src/main/java")) // Nycticorax - project setup
++            srcDir(file("../leaf-api/src/main/java")) // Sapling - project setup
          }
          resources {
              srcDir(file("../paper-api/src/main/resources"))
-+            srcDir(file("../leaf-api/src/main/resources")) // Nycticorax - project setup
++            srcDir(file("../leaf-api/src/main/resources")) // Sapling - project setup
          }
      }
      test {
          java {
              srcDir(file("../paper-api/src/test/java"))
-+            srcDir(file("../leaf-api/src/test/java")) // Nycticorax - project setup
++            srcDir(file("../leaf-api/src/test/java")) // Sapling - project setup
          }
          resources {
              srcDir(file("../paper-api/src/test/resources"))
-+            srcDir(file("../leaf-api/src/test/resources")) // Nycticorax - project setup
++            srcDir(file("../leaf-api/src/test/resources")) // Sapling - project setup
              // Leaf end - project setup
          }
      }
