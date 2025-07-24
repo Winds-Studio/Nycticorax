@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfo.java b/src/main/java/io/papermc/paper/ServerBuildInfo.java
-index c198304386e83edc2ec582fdf66d97d624004771..8a7936606873a09c222746b5b90ec1e2049a6f9a 100644
+index c198304386e83edc2ec582fdf66d97d624004771..10bc705260a6212a65a2e7e56ce4a7052b03ba39 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfo.java
 +++ b/src/main/java/io/papermc/paper/ServerBuildInfo.java
 @@ -41,6 +41,13 @@ public interface ServerBuildInfo {
@@ -16,7 +16,7 @@ index c198304386e83edc2ec582fdf66d97d624004771..8a7936606873a09c222746b5b90ec1e2
 +    /**
 +     * The brand id for Sapling.
 +     */
-+    Key BRAND_NYCTICORAX_ID = Key.key("winds-studio", "sapling");
++    Key BRAND_SAPLING_ID = Key.key("winds-studio", "sapling");
 +    // Sapling end - Rebrand
 +
      /**
